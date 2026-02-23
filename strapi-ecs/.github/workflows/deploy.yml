@@ -5,13 +5,6 @@ on:
     branches:
       - main
 
-env:
-  AWS_REGION: us-east-1
-  ECR_REPOSITORY: strapi-ecs
-  ECS_CLUSTER: strapi-cluster
-  ECS_SERVICE: strapi-service
-  CONTAINER_NAME: strapi-ecs
-
 jobs:
   deploy:
     name: Build, Push and Deploy
@@ -26,7 +19,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: us-east-1
 
       - name: Login to Amazon ECR
         id: login-ecr
@@ -38,11 +31,11 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
-          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          docker build -t $ECR_REGISTRY/strapi-ecs:$IMAGE_TAG .
+          docker tag $ECR_REGISTRY/strapi-ecs:$IMAGE_TAG $ECR_REGISTRY/strapi-ecs:latest
+          docker push $ECR_REGISTRY/strapi-ecs:$IMAGE_TAG
+          docker push $ECR_REGISTRY/strapi-ecs:latest
+          echo "image=$ECR_REGISTRY/strapi-ecs:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
       - name: Download current task definition
         run: |
@@ -55,13 +48,13 @@ jobs:
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: task-definition.json
-          container-name: ${{ env.CONTAINER_NAME }}
+          container-name: strapi-ecs
           image: ${{ steps.build-image.outputs.image }}
 
       - name: Deploy new task definition to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: ${{ env.ECS_SERVICE }}
-          cluster: ${{ env.ECS_CLUSTER }}
+          service: strapi-service
+          cluster: strapi-cluster
           wait-for-service-stability: true
