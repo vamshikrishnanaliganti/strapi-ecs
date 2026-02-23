@@ -41,4 +41,5 @@ variable "db_username" {
 variable "db_password" {
   description = "RDS password"
   sensitive   = true
+  default     = "Strapi_1234#"
 }

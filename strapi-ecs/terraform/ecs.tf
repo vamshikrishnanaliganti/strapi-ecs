@@ -66,12 +66,25 @@ resource "aws_ecs_task_definition" "strapi" {
         {
           name  = "PORT"
           value = tostring(var.container_port)
-        }
+        },
+        {
+  name  = "DATABASE_SSL"
+  value = "true"
+},
+{
+  name  = "DATABASE_SSL_REJECT_UNAUTHORIZED"
+  value = "false"
+},
+ { name = "APP_KEYS",               value = "key1,key2,key3,key4" },
+        { name = "API_TOKEN_SALT",         value = "yoursalt" },
+        { name = "ADMIN_JWT_SECRET",       value = "youradminsecret" },
+        { name = "JWT_SECRET",             value = "yourjwtsecret" }
       ]
 
       logConfiguration = {
         logDriver = "awslogs"
         options = {
+
           "awslogs-group"         = "/ecs/${var.app_name}"
           "awslogs-region"        = var.aws_region
           "awslogs-stream-prefix" = "ecs"
