@@ -36,7 +36,10 @@ jobs:
           echo "image=$ECR_REGISTRY/strapi-ecs:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
       - name: Download task definition
-        run: aws ecs describe-task-definition --task-definition strapi-ecs-task --query taskDefinition > task-definition.json
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition strapi-ecs-task \
+            --query taskDefinition > task-definition.json
 
       - name: Render task definition
         id: task-def
