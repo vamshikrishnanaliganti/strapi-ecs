@@ -31,7 +31,7 @@ resource "aws_db_subnet_group" "main" {
 
 # RDS PostgreSQL Instance
 resource "aws_db_instance" "postgres" {
-  identifier        = "${var.app_name}-db"
+  identifier        = "strapi-ecs-db"
   engine            = "postgres"
   engine_version    = "15"
   instance_class    = "db.t3.micro"
